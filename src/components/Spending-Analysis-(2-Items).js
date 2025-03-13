@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, MenuItem, Button, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
-import 'chart.js/auto'; // This is necessary to auto-register all the controllers
-import ChartDataLabels from 'chartjs-plugin-datalabels'; // Import the plugin
+import 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 function SpendingAnalysis() {
   const [budgets, setBudgets] = useState([]);
@@ -12,7 +12,6 @@ function SpendingAnalysis() {
   const [chartData, setChartData] = useState(null);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
 
-  // Fetch budgets and expenses from the backend
   const fetchBudgetsAndExpenses = async () => {
     try {
       const budgetsResponse = await fetch('http://localhost:9000/budgets');
@@ -27,15 +26,13 @@ function SpendingAnalysis() {
     }
   };
 
-  // Use effect to fetch budgets and expenses on component mount
   useEffect(() => {
     fetchBudgetsAndExpenses();
   }, []);
 
-  // Function to handle the selection of budget and expense
   const handleSelection = () => {
     if (!selectedBudget || !selectedExpense) {
-      setShowErrorDialog(true); // Show error dialog if either budget or expense is not selected
+      setShowErrorDialog(true);
       return;
     }
 
@@ -46,34 +43,23 @@ function SpendingAnalysis() {
       setChartData({
         labels: ['Selected Items'],
         datasets: [
-          {
-            label: 'Budget',
-            data: [selectedBudgetData.amount],
-            backgroundColor: 'dodgerblue',
-          },
-          {
-            label: 'Expense',
-            data: [selectedExpenseData.amount],
-            backgroundColor: '#ED2939', // Pantone Red
-          },
+          { label: 'Budget', data: [selectedBudgetData.amount], backgroundColor: 'dodgerblue' },
+          { label: 'Expense', data: [selectedExpenseData.amount], backgroundColor: '#ED2939' },
         ],
       });
     }
   };
 
-  // Function to handle closing the error dialog
-  const handleCloseErrorDialog = () => {
-    setShowErrorDialog(false);
-  };
+  const handleCloseErrorDialog = () => setShowErrorDialog(false);
 
   return (
-    <Box sx={{ maxWidth: 1000, margin: 'auto', marginTop: '80px', marginBottom: '80px' }}>
-      <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center', color: 'black' }} gutterBottom>
+    <Box sx={{ py: { xs: 2, md: 10 }, px: 2, maxWidth: 'lg', mx: 'auto' }}>
+      <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center', color: 'black', mb: 4 }}>
         Spending Analysis (2 Items)
       </Typography>
 
-      <Paper sx={{ padding: '20px', marginBottom: '20px', backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black', textAlign: 'center', padding: '10px' }}>
+      <Paper sx={{ p: 2, mb: 2, backgroundColor: 'rgba(255, 255, 255, 0.4)', maxWidth: 600, mx: 'auto' }}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'black', textAlign: 'center', mb: 2 }}>
           Select Budget and Expense
         </Typography>
 
@@ -84,8 +70,7 @@ function SpendingAnalysis() {
           value={selectedBudget}
           onChange={(e) => setSelectedBudget(e.target.value)}
           fullWidth
-          SelectProps={{ style: { color: 'black', fontSize: 20, '&:before': { borderBottom: '1px solid black' }, '&:after': { borderBottom: '2px solid black' }} }}
-          sx={{ marginBottom: '20px', input: { color: 'black', fontSize: 20 }, label: { color: 'black', fontWeight: 'bold', fontSize: 20 }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': {borderColor: '#C0C0C0' }} }}
+          sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
           {budgets.map((budget) => (
             <MenuItem key={budget.id} value={budget.id}>
@@ -101,8 +86,7 @@ function SpendingAnalysis() {
           value={selectedExpense}
           onChange={(e) => setSelectedExpense(e.target.value)}
           fullWidth
-          SelectProps={{ style: { color: 'black', fontSize: 20, '&:before': { borderBottom: '1px solid black' }, '&:after': { borderBottom: '2px solid black' }} }}
-          sx={{ marginBottom: '20px', input: { color: 'black', fontSize: 20 }, label: { color: 'black', fontWeight: 'bold', fontSize: 20 }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': {borderColor: '#C0C0C0' }} }}
+          sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
           {expenses.map((expense) => (
             <MenuItem key={expense.id} value={expense.id}>
@@ -111,82 +95,52 @@ function SpendingAnalysis() {
           ))}
         </TextField>
 
-        <Button sx={{ fontWeight: 'bold', fontSize: 20, width: 500, margin: 'auto', color: 'white', backgroundColor: '#343434', display: 'block' }} type="submit" variant="contained" color="primary" onClick={handleSelection} >
+        <Button
+          sx={{ fontWeight: 'bold', fontSize: { xs: 16, md: 20 }, color: 'white', backgroundColor: '#343434', display: 'block', mx: 'auto' }}
+          variant="contained"
+          onClick={handleSelection}
+          fullWidth
+        >
           Show Analysis
         </Button>
       </Paper>
 
-      {/* Error Dialog */}
-      <Dialog
-        open={showErrorDialog}
-        onClose={handleCloseErrorDialog}
-        aria-labelledby="error-dialog-title"
-        aria-describedby="error-dialog-description"
-      >
-        <DialogTitle id="error-dialog-title">Error</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="error-dialog-description">
-            Please select both a budget and an expense to show the analysis.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseErrorDialog} color="primary" autoFocus>
-            OK
-          </Button>
-        </DialogActions>
+      <Dialog open={showErrorDialog} onClose={handleCloseErrorDialog}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent><DialogContentText>Please select both a budget and an expense to show the analysis.</DialogContentText></DialogContent>
+        <DialogActions><Button onClick={handleCloseErrorDialog} autoFocus>OK</Button></DialogActions>
       </Dialog>
 
-      {/* Chart */}
       {chartData && (
-        <Paper sx={{ padding: '20px', backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black', textAlign: 'center' }}>
+        <Paper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'black', textAlign: 'center', mb: 2 }}>
             Budget vs Expense
           </Typography>
-          
-          <Bar
-            data={chartData}
-            options={{
-              plugins: {
-                datalabels: {
-                  display: true,
-                  align: 'end',
-                  anchor: 'end',
-                  formatter: (value) => {
-                    if (value !== null) {
-                      return `Rs. ${value}`;
-                    }
-                    return '';
-                  },
-                  color: 'black',
-                    font: {
-                      weight: 'bold',
-                      size: 20,
-                    },
-                },
-              },
-              scales: {
-                x: {
-                  ticks: {
+          <Box sx={{ maxWidth: { xs: '100%', md: 600 }, mx: 'auto' }}>
+            <Bar
+              data={chartData}
+              options={{
+                plugins: {
+                  datalabels: {
+                    display: true,
+                    align: 'end',
+                    anchor: 'end',
+                    formatter: (value) => (value !== null ? `Rs. ${value}` : ''),
                     color: 'black',
-                    font: {
-                      weight: 'bold',
-                      size: 20,
-                    },
+                    font: { weight: 'bold', size: { xs: 14, md: 20 } },
                   },
                 },
-                y: {
-                  ticks: {
-                    color: 'black',
-                    font: {
-                      weight: 'bold',
-                      size: 20,
-                    },
-                  },
+                scales: {
+                  x: { ticks: { color: 'black', font: { weight: 'bold', size: { xs: 14, md: 20 } } } },
+                  y: { ticks: { color: 'black', font: { weight: 'bold', size: { xs: 14, md: 20 } } } },
                 },
-              },
-            }}
-            plugins={[ChartDataLabels]} // Add the plugin
-          />
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+              height={300}
+              plugins={[ChartDataLabels]}
+            />
+          </Box>
         </Paper>
       )}
     </Box>

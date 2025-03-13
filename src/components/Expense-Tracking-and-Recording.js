@@ -4,7 +4,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 function ExpenseManagement() {
-  // State variables for form inputs, errors, and expenses
   const [expenseName, setExpenseName] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('');
@@ -22,7 +21,6 @@ function ExpenseManagement() {
   const [openCustomCategoryDialog, setOpenCustomCategoryDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
 
-  // Fetch expenses from the backend
   const fetchExpenses = async () => {
     try {
       const response = await fetch('http://localhost:9000/expenses');
@@ -33,13 +31,6 @@ function ExpenseManagement() {
     }
   };
 
-  // Use effect to fetch expenses and categories on component mount
-  useEffect(() => {
-    fetchExpenses();
-    fetchCategories();
-  }, []);
-
-  // Fetch categories from the backend
   const fetchCategories = async () => {
     try {
       const response = await fetch('http://localhost:9000/budget-categories');
@@ -50,45 +41,29 @@ function ExpenseManagement() {
     }
   };
 
-  // Function to handle form submission
+  useEffect(() => {
+    fetchExpenses();
+    fetchCategories();
+  }, []);
+
   const handleSave = async (e) => {
     e.preventDefault();
-
-    // Validate form inputs
     const errors = {};
-    if (!expenseName.trim()) {
-      errors.expenseName = 'Expense Name is required';
-    }
-    if (!expenseAmount.trim()) {
-      errors.expenseAmount = 'Expense Amount is required';
-    } else if (isNaN(expenseAmount)) {
-      errors.expenseAmount = 'Expense Amount must be a number';
-    }
-    if (!expenseCategory.trim()) {
-      errors.expenseCategory = 'Expense Category is required';
-    }
-    if (!expenseDate.trim()) {
-      errors.expenseDate = 'Expense Date is required';
-    }
+    if (!expenseName.trim()) errors.expenseName = 'Expense Name is required';
+    if (!expenseAmount.trim()) errors.expenseAmount = 'Expense Amount is required';
+    else if (isNaN(expenseAmount)) errors.expenseAmount = 'Expense Amount must be a number';
+    if (!expenseCategory.trim()) errors.expenseCategory = 'Expense Category is required';
+    if (!expenseDate.trim()) errors.expenseDate = 'Expense Date is required';
 
-    // If there are errors, set the state and return
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
       return;
     }
 
-    // If there are no errors, save the expense
     const response = await fetch('http://localhost:9000/expenses', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: expenseName,
-        amount: parseFloat(expenseAmount),
-        category: expenseCategory,
-        date: expenseDate,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: expenseName, amount: parseFloat(expenseAmount), category: expenseCategory, date: expenseDate }),
     });
 
     if (!response.ok) {
@@ -97,62 +72,37 @@ function ExpenseManagement() {
       return;
     }
 
-    // Fetch updated expense data
     fetchExpenses();
-
-    // Reset form inputs and errors
     setExpenseName('');
     setExpenseAmount('');
     setExpenseCategory('');
     setExpenseDate('');
     setErrors({});
-
-    // Show success message
     setDialogMessage('Expense saved successfully');
     setOpenSuccessDialog(true);
   };
 
-  // Function to handle delete confirmation
   const handleConfirmDelete = async () => {
     if (!expenseToDelete) return;
-
-    const response = await fetch(`http://localhost:9000/expenses/${expenseToDelete}`, {
-      method: 'DELETE',
-    });
-
+    const response = await fetch(`http://localhost:9000/expenses/${expenseToDelete}`, { method: 'DELETE' });
     if (!response.ok) {
       setDialogMessage('Failed to delete expense. Please try again later.');
       setOpenErrorDialog(true);
       setOpenDeleteDialog(false);
       return;
     }
-
-    // Fetch updated expense data
     fetchExpenses();
-
-    // Close delete dialog
     setOpenDeleteDialog(false);
-
-    // Show success message
     setDialogMessage('Expense deleted successfully');
     setOpenSuccessDialog(true);
   };
 
-  // Function to handle edit confirmation
   const handleConfirmEdit = async () => {
     if (!expenseToEdit) return;
-
     const response = await fetch(`http://localhost:9000/expenses/${expenseToEdit.id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: expenseName,
-        amount: parseFloat(expenseAmount),
-        category: expenseCategory,
-        date: expenseDate,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: expenseName, amount: parseFloat(expenseAmount), category: expenseCategory, date: expenseDate }),
     });
 
     if (!response.ok) {
@@ -162,36 +112,23 @@ function ExpenseManagement() {
       return;
     }
 
-    // Fetch updated expense data
     fetchExpenses();
-
-    // Reset form inputs and errors
     setExpenseName('');
     setExpenseAmount('');
     setExpenseCategory('');
     setExpenseDate('');
     setErrors({});
-
-    // Close edit dialog
     setOpenEditDialog(false);
-
-    // Show success message
     setDialogMessage('Expense edited successfully');
     setOpenSuccessDialog(true);
   };
 
-  // Function to handle custom category submission
   const handleCustomCategorySubmit = async () => {
     if (!customCategory.trim()) return;
-
     const response = await fetch('http://localhost:9000/budget-categories', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: customCategory,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: customCategory }),
     });
 
     if (!response.ok) {
@@ -201,33 +138,24 @@ function ExpenseManagement() {
       return;
     }
 
-    // Fetch updated categories
     fetchCategories();
-
-    // Reset custom category input
     setCustomCategory('');
-
-    // Close custom category dialog
     setOpenCustomCategoryDialog(false);
-
-    // Show success message
     setDialogMessage('Category saved successfully');
     setOpenSuccessDialog(true);
   };
 
   return (
-    <Box sx={{ maxWidth: 1000, margin: 'auto', marginTop: '80px', marginBottom:'80px' }}>
-      <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center', color: 'black' }} gutterBottom>
+    <Box sx={{ py: { xs: 2, md: 10 }, px: 2, maxWidth: 'lg', mx: 'auto' }}>
+      <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center', color: 'black', mb: 4 }}>
         Expense Tracking and Recording
       </Typography>
 
-      <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'black', textAlign: 'center', padding: '5px' }} gutterBottom>
+      <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'black', textAlign: 'center', mb: 2 }}>
         Add Expense
       </Typography>
 
-      {/* Expense Form */}
-      <Box component="form" onSubmit={handleSave} sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {/* Expense Name */}
+      <Box component="form" onSubmit={handleSave} sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600, mx: 'auto' }}>
         <TextField
           id="expense-name"
           label="Expense Name"
@@ -237,10 +165,9 @@ function ExpenseManagement() {
           error={!!errors.expenseName}
           helperText={errors.expenseName}
           required
-          sx={{ input: { color: 'black', fontSize: 20 }, label: { color: 'black', fontWeight: 'bold', fontSize: 20 }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': {borderColor: '#C0C0C0' }}, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+          fullWidth
+          sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         />
-
-        {/* Expense Amount */}
         <TextField
           id="expense-amount"
           label="Expense Amount (Rs.)"
@@ -251,10 +178,9 @@ function ExpenseManagement() {
           error={!!errors.expenseAmount}
           helperText={errors.expenseAmount}
           required
-          sx={{ input: { color: 'black', fontSize: 20 }, label: { color: 'black', fontWeight: 'bold', fontSize: 20 }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': {borderColor: '#C0C0C0' }}, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+          fullWidth
+          sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         />
-
-        {/* Expense Category */}
         <TextField
           id="expense-category"
           select
@@ -265,21 +191,18 @@ function ExpenseManagement() {
           error={!!errors.expenseCategory}
           helperText={errors.expenseCategory}
           required
-          SelectProps={{ style: { color: 'black', fontSize: 20, '&:before': { borderBottom: '1px solid black' }, '&:after': { borderBottom: '2px solid black' }} }}
-          sx={{ input: { color: 'black', fontSize: 20 }, label: { color: 'black', fontWeight: 'bold', fontSize: 20 }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': {borderColor: '#C0C0C0' }}, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+          fullWidth
+          sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
           {categories.map((category) => (
             <MenuItem key={category.id} value={category.name}>
               {category.name}
             </MenuItem>
           ))}
-          {/* Option to add a custom category */}
           <MenuItem value="custom" onClick={() => setOpenCustomCategoryDialog(true)}>
             Add Custom Category
           </MenuItem>
         </TextField>
-
-        {/* Expense Date */}
         <TextField
           id="expense-date"
           label="Expense Date"
@@ -290,63 +213,28 @@ function ExpenseManagement() {
           error={!!errors.expenseDate}
           helperText={errors.expenseDate}
           required
-          sx={{ input: { color: 'black', fontSize: 20 }, label: { color: 'black', fontWeight: 'bold', fontSize: 20 }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': {borderColor: '#C0C0C0' }}, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
-          InputLabelProps={{
-            shrink: true,
-          }}
+          fullWidth
+          sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+          InputLabelProps={{ shrink: true }}
         />
-
-        {/* Submit Button */}
-        <Button sx={{ fontWeight: 'bold', fontSize: 20, width: 500, margin: 'auto', color: 'white', backgroundColor: '#343434' }} type="submit" variant="contained" >
+        <Button sx={{ fontWeight: 'bold', fontSize: { xs: 16, md: 20 }, color: 'white', backgroundColor: '#343434' }} type="submit" variant="contained" fullWidth>
           Add Expense
         </Button>
       </Box>
 
-      {/* Custom Category Dialog */}
-      <Dialog
-        open={openCustomCategoryDialog}
-        onClose={() => setOpenCustomCategoryDialog(false)}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Add Custom Category</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="custom-category"
-            label="Category Name"
-            type="text"
-            fullWidth
-            value={customCategory}
-            onChange={(e) => setCustomCategory(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCustomCategoryDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleCustomCategorySubmit} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Display Expenses */}
-      <Typography variant="h4" gutterBottom sx={{ marginTop: '20px', fontWeight: 'bold', color: 'black', textAlign: 'center', padding: '10px' }}>
+      <Typography variant="h4" sx={{ mt: 4, mb: 2, fontWeight: 'bold', color: 'black', textAlign: 'center' }}>
         Expense List
       </Typography>
 
-      {/*List of Expenses*/}
-      <Grid container spacing={2}>
+      <Grid container spacing={2} justifyContent="center">
         {expenses.map((expense) => (
-          <Grid item key={expense.id} xs={12} md={5} sx={{ margin: 'auto' }}>
-            <Paper sx={{ padding: 2, backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
+          <Grid item xs={12} sm={6} md={4} key={expense.id}>
+            <Paper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
               <Typography variant="h5" sx={{ color: 'black', fontWeight: 'bold' }}>{expense.name}</Typography>
-              <Typography variant="body1">Amount: Rs. {expense.amount}</Typography>
-              <Typography variant="body1">Category: {expense.category}</Typography>
-              <Typography variant="body1">Date: {expense.date}</Typography>
-              {/* Edit Button */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, marginTop: 1 }}>
+              <Typography variant="body1" sx={{ color: 'black' }}>Amount: Rs. {expense.amount}</Typography>
+              <Typography variant="body1" sx={{ color: 'black' }}>Category: {expense.category}</Typography>
+              <Typography variant="body1" sx={{ color: 'black' }}>Date: {expense.date}</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1 }}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -359,11 +247,9 @@ function ExpenseManagement() {
                     setExpenseDate(expense.date);
                     setOpenEditDialog(true);
                   }}
-                  sx={{ marginTop: '8px', marginRight: '8px' }} // Add margin for spacing
                 >
                   Edit
                 </Button>
-                {/* Delete Button */}
                 <Button
                   variant="contained"
                   color="error"
@@ -372,7 +258,6 @@ function ExpenseManagement() {
                     setExpenseToDelete(expense.id);
                     setOpenDeleteDialog(true);
                   }}
-                  sx={{ marginTop: '8px' }} // Add margin for spacing
                 >
                   Delete
                 </Button>
@@ -382,34 +267,20 @@ function ExpenseManagement() {
         ))}
       </Grid>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={openDeleteDialog}
-        onClose={() => setOpenDeleteDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+      {/* Dialogs */}
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this expense?
-          </DialogContentText>
+          <DialogContentText>Are you sure you want to delete this expense?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} autoFocus>
-            Confirm
-          </Button>
+          <Button onClick={handleConfirmDelete} autoFocus>Confirm</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Edit Dialog */}
-      <Dialog
-        open={openEditDialog}
-        onClose={() => setOpenEditDialog(false)}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Edit Expense</DialogTitle>
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>Edit Expense</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -440,75 +311,56 @@ function ExpenseManagement() {
             onChange={(e) => setExpenseCategory(e.target.value)}
           >
             {categories.map((category) => (
-              <MenuItem key={category.id} value={category.name}>
-                {category.name}
-              </MenuItem>
+              <MenuItem key={category.id} value={category.name}>{category.name}</MenuItem>
             ))}
-            {/* Option to add a custom category */}
-            <MenuItem value="custom" onClick={() => setOpenCustomCategoryDialog(true)}>
-              Add Custom Category
-            </MenuItem>
+            <MenuItem value="custom" onClick={() => setOpenCustomCategoryDialog(true)}>Add Custom Category</MenuItem>
           </TextField>
           <TextField
+            margin="dense"
             id="expense-date"
             label="Expense Date"
-            variant="outlined"
             type="date"
+            fullWidth
             value={expenseDate}
             onChange={(e) => setExpenseDate(e.target.value)}
-            required
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmEdit} color="primary">
-            Save
-          </Button>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+          <Button onClick={handleConfirmEdit}>Save</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Success Dialog */}
-      <Dialog
-        open={openSuccessDialog}
-        onClose={() => setOpenSuccessDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Success</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {dialogMessage}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenSuccessDialog(false)} autoFocus>
-            OK
-          </Button>
-        </DialogActions>
+      <Dialog open={openSuccessDialog} onClose={() => setOpenSuccessDialog(false)}>
+        <DialogTitle>Success</DialogTitle>
+        <DialogContent><DialogContentText>{dialogMessage}</DialogContentText></DialogContent>
+        <DialogActions><Button onClick={() => setOpenSuccessDialog(false)} autoFocus>OK</Button></DialogActions>
       </Dialog>
 
-      {/* Error Dialog */}
-      <Dialog
-        open={openErrorDialog}
-        onClose={() => setOpenErrorDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Error</DialogTitle>
+      <Dialog open={openErrorDialog} onClose={() => setOpenErrorDialog(false)}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent><DialogContentText>{dialogMessage}</DialogContentText></DialogContent>
+        <DialogActions><Button onClick={() => setOpenErrorDialog(false)} autoFocus>OK</Button></DialogActions>
+      </Dialog>
+
+      <Dialog open={openCustomCategoryDialog} onClose={() => setOpenCustomCategoryDialog(false)}>
+        <DialogTitle>Add Custom Category</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {dialogMessage}
-          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="custom-category"
+            label="Category Name"
+            type="text"
+            fullWidth
+            value={customCategory}
+            onChange={(e) => setCustomCategory(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenErrorDialog(false)} autoFocus>
-            OK
-          </Button>
+          <Button onClick={() => setOpenCustomCategoryDialog(false)}>Cancel</Button>
+          <Button onClick={handleCustomCategorySubmit}>Save</Button>
         </DialogActions>
       </Dialog>
     </Box>

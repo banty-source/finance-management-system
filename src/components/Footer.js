@@ -7,14 +7,10 @@ const useStyles = makeStyles((theme) => ({
     top: 'auto',
     bottom: 0,
     width: '100%',
-    position: 'fixed', // Fixed position ensures the footer sticks to the bottom
-    backgroundColor: theme.palette.primary.main,
+    position: 'fixed',
+    backgroundColor: '#343434',
     color: theme.palette.common.white,
-    textAlign: 'center', // Align content to the center
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    textAlign: 'center',
   },
 }));
 
@@ -22,10 +18,10 @@ function Footer() {
   const classes = useStyles();
 
   return (
-    <AppBar position="static" className={classes.footer} sx={{ bgcolor: "#343434" }}>
+    <AppBar position="static" className={classes.footer}>
       <Toolbar>
-        <Typography sx={{ fontSize: 20 }}>
-          Design & Built by SSB &copy; 2025
+        <Typography sx={{ fontSize: { xs: 16, md: 20 } }}>
+          Design & Built by SSB © 2025
         </Typography>
       </Toolbar>
     </AppBar>
