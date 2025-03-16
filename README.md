@@ -102,6 +102,7 @@ The frontend will run on `http://localhost:3000`.
 
 Ensure both servers are running for full functionality!
 
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to fork the repository and submit pull requests.
