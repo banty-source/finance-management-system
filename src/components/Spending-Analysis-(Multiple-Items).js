@@ -63,14 +63,14 @@ function SpendingAnalysis() {
 
     selectedBudgetData.forEach((budget) => {
       labels.push(budget.name);
-      budgetAmounts.push(budget.amount);
-      expenseAmounts.push(null);
+      budgetAmounts.push(Number(budget.amount) || 0);
+      expenseAmounts.push(0);
     });
 
     selectedExpenseData.forEach((expense) => {
       labels.push(expense.name);
-      expenseAmounts.push(expense.amount);
-      budgetAmounts.push(null);
+      expenseAmounts.push(Number(expense.amount) || 0);
+      budgetAmounts.push(0);
     });
 
     setChartData({
@@ -155,19 +155,20 @@ function SpendingAnalysis() {
                     anchor: 'end',
                     formatter: (value) => (value !== null ? `Rs. ${value}` : ''),
                     color: 'black',
-                    font: { weight: 'bold', size: { xs: 12, md: 20 } },
-                  },
-                },
-                scales: {
-                  x: { ticks: { color: 'black', font: { weight: 'bold', size: { xs: 12, md: 20 } } } },
-                  y: { ticks: { color: 'black', font: { weight: 'bold', size: { xs: 12, md: 20 } } } },
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-              height={400}
-              plugins={[ChartDataLabels]}
-            />
+                font: { weight: 'bold', size: 16 },
+              },
+            },
+            scales: {
+              x: { ticks: { color: 'black', font: { weight: 'bold', size: 16 } } },
+              y: { ticks: { color: 'black', font: { weight: 'bold', size: 16 } } },
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+          }}
+          key={chartData ? JSON.stringify(chartData) : 'no-data'}
+          height={400}
+          plugins={[ChartDataLabels]}
+        />
           </Box>
         </Paper>
       )}
