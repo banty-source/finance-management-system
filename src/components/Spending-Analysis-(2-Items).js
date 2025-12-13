@@ -43,8 +43,8 @@ function SpendingAnalysis() {
       setChartData({
         labels: ['Selected Items'],
         datasets: [
-          { label: 'Budget', data: [selectedBudgetData.amount], backgroundColor: 'dodgerblue' },
-          { label: 'Expense', data: [selectedExpenseData.amount], backgroundColor: '#ED2939' },
+          { label: 'Budget', data: [Number(selectedBudgetData.amount) || 0], backgroundColor: 'dodgerblue' },
+          { label: 'Expense', data: [Number(selectedExpenseData.amount) || 0], backgroundColor: '#ED2939' },
         ],
       });
     }
@@ -68,7 +68,7 @@ function SpendingAnalysis() {
           select
           label="Select Budget"
           value={selectedBudget}
-          onChange={(e) => setSelectedBudget(e.target.value)}
+          onChange={(e) => setSelectedBudget(Number(e.target.value))}
           fullWidth
           sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
@@ -84,7 +84,7 @@ function SpendingAnalysis() {
           select
           label="Select Expense"
           value={selectedExpense}
-          onChange={(e) => setSelectedExpense(e.target.value)}
+          onChange={(e) => setSelectedExpense(Number(e.target.value))}
           fullWidth
           sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: '#C0C0C0' } }, backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
@@ -127,18 +127,19 @@ function SpendingAnalysis() {
                     anchor: 'end',
                     formatter: (value) => (value !== null ? `Rs. ${value}` : ''),
                     color: 'black',
-                    font: { weight: 'bold', size: { xs: 14, md: 20 } },
+                font: { weight: 'bold', size: 16 },
                   },
                 },
                 scales: {
-                  x: { ticks: { color: 'black', font: { weight: 'bold', size: { xs: 14, md: 20 } } } },
-                  y: { ticks: { color: 'black', font: { weight: 'bold', size: { xs: 14, md: 20 } } } },
+                  x: { ticks: { color: 'black', font: { weight: 'bold', size: 16 } } },
+                  y: { ticks: { color: 'black', font: { weight: 'bold', size: 16 } } },
                 },
                 responsive: true,
                 maintainAspectRatio: false,
               }}
-              height={300}
-              plugins={[ChartDataLabels]}
+            key={chartData ? JSON.stringify(chartData) : 'no-data'}
+            height={300}
+            plugins={[ChartDataLabels]}
             />
           </Box>
         </Paper>
